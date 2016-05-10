@@ -40,6 +40,9 @@ My dreams are now your reality. We can now channeling the spirit world through w
 
 OfficePoltergeist uses ssl and <a href="http://socket.io/">socket.io</a> to manage communication back to a Central Poltergeist Server. Think of it like the ghost storage unit in Ghostbusters, except a lot more like a cheap virtual machine in some datacenter somewhere. 
 
+## Where's the controller?
+Gosh! I'm totally working on it. None of this is "production" ready yet. I'll have a beta interface up shortly...
+
 # Credits
 - <a href="http://underscorejs.org/">underscore.js</a>
 - <a href="http://socket.io/">socket.io</a>
