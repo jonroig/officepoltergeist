@@ -16,7 +16,6 @@ officePoltergeist.runSearches = function() {
 
 	// re-do the new searchs
 	chrome.storage.local.get('searchArray', function (results) {
-		console.log('searchArray', results.searchArray);
 		_.each(results.searchArray, function(searchObj){
 
 			if (searchObj != null) {
@@ -39,11 +38,25 @@ officePoltergeist.runSearches = function() {
 officePoltergeist.applyCssEffects = function() {
 	webkitFilterArray = [];
 	chrome.storage.local.get('cssEffectsArray', function (results) {
+		console.log('results',results);
 		_.each(results.cssEffectsArray, function(cssEffectObj){
 			if (cssEffectObj != null) {
 				switch (cssEffectObj.effect) {
+					case 'texttransform':
+						_.each(cssEffectObj.targetArray, function(targetArrayObj){
+							$(targetArrayObj.target).css('text-transform', cssEffectObj.value);
+						});
+						break;
+					case 'cursor':
+						$(document.body).css({cursor: cssEffectObj.value});
+						break;
 					case 'blur':
 						webkitFilterArray.push({target: cssEffectObj.target, cssEffect: " blur(" + cssEffectObj.value + "px)" })
+						break;
+					case 'textrotate':
+						_.each(cssEffectObj.targetArray, function(targetArrayObj){
+							$(targetArrayObj.target).css('transform', "rotate(" + cssEffectObj.value + "deg)");
+						});
 						break;
 					case 'rotate':
 						$(cssEffectObj.target).css("transform", "rotate(" + cssEffectObj.value + "deg)");
@@ -105,27 +118,28 @@ officePoltergeist.applyCssEffects = function() {
 
 // http://www.youtube.com/v/oHg5SJYRHA0?version=3
 officePoltergeist.applyPageEffects = function() {
-	_.each(officePoltergeist.localBrowserEffectsObj['pageEffectsArray'], function(pageEffectObj){
-		if (pageEffectObj.activated == "true") {
-			switch (pageEffectObj.effect) {
-				case 'rickroll':
-
-					// attack the iframe... change it to what we want...
-					var iframes = $('iframe');
-					_.each(iframes, function(iframeObj) {
-						var iframeTarget = $(iframeObj);
-						if (iframeTarget.attr('src')) {
-							if (iframeTarget.attr('src').indexOf('youtube') > -1 && iframeTarget.attr('src') != 'https://www.youtube.com/embed/oHg5SJYRHA0') {
-								iframeTarget.attr('src', 'https://www.youtube.com/embed/oHg5SJYRHA0');
+	chrome.storage.local.get('pageEffectsArray', function (results) {
+		_.each(results.pageEffectsArray, function(pageEffectObj){
+			if (pageEffectObj.activated == true) {
+				switch (pageEffectObj.effect) {
+					case 'rickroll':
+						// attack the iframe... change it to what we want...
+						var iframes = $('iframe');
+						_.each(iframes, function(iframeObj) {
+							var iframeTarget = $(iframeObj);
+							if (iframeTarget.attr('src')) {
+								if (iframeTarget.attr('src').indexOf('youtube') > -1 && iframeTarget.attr('src') != 'https://www.youtube.com/embed/oHg5SJYRHA0') {
+									iframeTarget.attr('src', 'https://www.youtube.com/embed/oHg5SJYRHA0');
+								}
 							}
-						}
-					});
+						});
 
-					break;
-				default:
-					// don't do anything
+						break;
+					default:
+						// don't do anything
+				}
 			}
-		}
+		});
 	});
 }
 
@@ -157,12 +171,14 @@ $(document).ready(function() {
 });
 
 // any keyboard effects are handled in here...
-$(document).on( "keydown", function(){
+$(document).on( "keydown", function(keyEvent){
 	chrome.storage.local.get('keyEffectsArray', function (results) {
+		console.log('keyEffectsArray',results);
 		_.each(results.keyEffectsArray, function(keyEffectObj){
-			if (keyEffectObj.activated == "true") {
+			if (keyEffectObj.activated == true) {
 				switch (keyEffectObj.effect) {
 					case 'loudTyping' :
+						console.log('loudTyping');
 						var myAudio = new Audio();
 						myAudio.src = chrome.extension.getURL("media/button_push.mp3");
 						myAudio.play();
@@ -174,3 +190,5 @@ $(document).on( "keydown", function(){
 		});
 	});
 });
+
+

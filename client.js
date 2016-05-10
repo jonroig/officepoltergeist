@@ -1,6 +1,6 @@
 // this runs in the background of the browser...
 
-var socket = io("http://127.0.0.1:3000");
+var socket = io("https://officepoltergeist.net");
 
 // this is  model view poltergeist controller
 socket.on('hauntcontrol', function(msg){
@@ -115,5 +115,26 @@ hauntController.addToEffectArray = function(effectArray, resource) {
 		chrome.storage.local.set(saveObj);
 		return;
 	});
-};
+}
 
+// guid from http://stackoverflow.com/a/105074/1861347
+hauntController.generateGuid = function(){
+	function s4() {
+	    return Math.floor((1 + Math.random()) * 0x10000)
+	      .toString(16)
+	      .substring(1);
+	  }
+  return s4() + '-' + s4() + '-' + s4() + '-' + s4();
+}
+
+hauntController.poltergeistId = null;
+
+chrome.storage.local.get('poltergeistId', function (results) {
+	if (_.isEmpty(results)) {
+		hauntController.poltergeistId = hauntController.generateGuid();
+		chrome.storage.local.set('poltergeistId', hauntController.poltergeistId);
+	} else {
+		hauntController.poltergeistId = results.poltergeistId;
+	}
+	console.log('poltergeistId', results);
+});

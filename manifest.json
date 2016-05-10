@@ -13,14 +13,14 @@
   },
 
    "content_scripts": [ {
-      "css": [ "effects.css" ],
       "js": [ "jquery-2.2.3.min.js", "underscore-min.js", "findAndReplaceDOMText.js", "background.js" ],
       "matches": [ "\u003Call_urls>" ],
       "run_at": "document_end"
    } ],
 
    "web_accessible_resources": [
-      "media/*.*"
+      "media/*.*",
+      "popupjs/popup.js"
    ],
 
   "manifest_version": 2
