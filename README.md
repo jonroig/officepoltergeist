@@ -1,9 +1,13 @@
 # OfficePoltergeist
 ## Real Time Remote Control Browser Haunting From Your Phone
+### Coming Summer 2016
 
 Official Website: <a href="https://officepoltergeist.net">OfficePoltergeist.net</a>
 
-Chrome Store: coming soon
+Chrome Extension Store: Coming Soon
+
+Mobile App: Coming Soon
+
 
 ### Features!
 * Effortless install / removal as a Chrome Extension
