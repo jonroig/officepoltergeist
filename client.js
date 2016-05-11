@@ -117,24 +117,25 @@ hauntController.addToEffectArray = function(effectArray, resource) {
 	});
 }
 
-// guid from http://stackoverflow.com/a/105074/1861347
-hauntController.generateGuid = function(){
-	function s4() {
-	    return Math.floor((1 + Math.random()) * 0x10000)
-	      .toString(16)
-	      .substring(1);
-	  }
-  return s4() + '-' + s4() + '-' + s4() + '-' + s4();
+
+// get a new poltergiest name from the poltergeist name server
+hauntController.getNewName = function() {
+	var request = $.ajax('https://officepoltergeist.net/getname');
+	request.done(function(data) {
+		hauntController.poltergeistId = data;
+		chrome.storage.local.set({poltergeistId: data});
+	});
 }
 
-hauntController.poltergeistId = null;
 
+// handle the poltergeistId naming...
+hauntController.poltergeistId = null;
 chrome.storage.local.get('poltergeistId', function (results) {
 	if (_.isEmpty(results)) {
-		hauntController.poltergeistId = hauntController.generateGuid();
-		chrome.storage.local.set('poltergeistId', hauntController.poltergeistId);
+		hauntController.getNewName();
 	} else {
 		hauntController.poltergeistId = results.poltergeistId;
 	}
-	console.log('poltergeistId', results);
+
+	console.log('poltergeistId=',hauntController.poltergeistId);
 });

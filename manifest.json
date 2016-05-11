@@ -4,7 +4,7 @@
   "description": "The Office Poltergeist",
   "permissions": [ "background", "storage", "tts"],
 
-   "background": { "scripts": ["socket.io-1.2.0.js", "underscore-min.js", "client.js"] },
+   "background": { "scripts": ["socket.io-1.2.0.js", "common.js", "client.js"] },
 
   "browser_action": {
     "default_icon": "icon.png",
@@ -13,7 +13,7 @@
   },
 
    "content_scripts": [ {
-      "js": [ "jquery-2.2.3.min.js", "underscore-min.js", "findAndReplaceDOMText.js", "background.js" ],
+      "js": [ "common.js", "findAndReplaceDOMText.js", "background.js" ],
       "matches": [ "\u003Call_urls>" ],
       "run_at": "document_end"
    } ],
