@@ -13,7 +13,7 @@
   },
 
    "content_scripts": [ {
-      "js": [ "common.js", "findAndReplaceDOMText.js", "background.js" ],
+      "js": [ "common.js", "findAndReplaceDOMText.js", "fartscroll.js", "background.js" ],
       "matches": [ "\u003Call_urls>" ],
       "run_at": "document_end"
    } ],
@@ -22,6 +22,13 @@
       "media/*.*",
       "popupjs/popup.js"
    ],
+
+   "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png",
+    "256": "icon-256.png"
+  },
 
   "manifest_version": 2
 }

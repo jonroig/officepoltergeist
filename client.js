@@ -1,6 +1,12 @@
 // this runs in the background of the browser...
+var hauntController = hauntController || {};
 
-var socket = io("https://officepoltergeist.net");
+//var socket = io("https://officepoltergeist.net");
+var socket = io("http://127.0.0.1:3000");
+
+socket.on('announcement', function(announcement){
+	console.log('announcement', announcement);
+});
 
 // this is  model view poltergeist controller
 socket.on('hauntcontrol', function(msg){
@@ -20,13 +26,16 @@ socket.on('hauntcontrol', function(msg){
 			hauntController.cssEffect(msg.resource);
 			break;
 		case 'speak' :
-			hauntController.speak(msg.resource)
+			hauntController.speak(msg.resource);
 			break;
 		case 'keyEffect' :
-			hauntController.keyEffect(msg.resource)
+			hauntController.keyEffect(msg.resource);
 			break;
 		case 'status' :
 			//return the status
+			break;
+		case 'scrollEffect' :
+			hauntController.scrollEffect(resource);
 			break;
 		default:
 			// don't do anything
@@ -34,8 +43,22 @@ socket.on('hauntcontrol', function(msg){
 });
 
 
-var hauntController = hauntController || {};
+// on connect handler
+socket.on('connect', function(){
+	console.log('connected');
+	hauntController.joinChannel();
+	if (hauntController.poltergeistStatus == false) {
+		hauntController.disconnect();
+	}
+});
 
+hauntController.disconnect = function() {
+	console.log('socket.disconnect();');
+	socket.disconnect();
+}
+
+
+// HAUNT CONTROLS
 
 // play a sound
 hauntController.soundArray = [];
@@ -98,6 +121,16 @@ hauntController.cssEffect = function(resource) {
 }
 
 
+// this is the home of the fartscroll, maybe more stuff later
+hauntController.scrollEffect = function(resource) {
+	if (resource == undefined) {
+		chrome.storage.local.remove('scrollEffectsArray');
+	}
+
+	hauntController.addToEffectArray('scrollEffectsArray', resource);
+}
+
+
 // this just keeps track of all of the filters of a given type, keeping
 // 'em organized, unique, and stored in local storage for the client to
 // consume
@@ -124,18 +157,92 @@ hauntController.getNewName = function() {
 	request.done(function(data) {
 		hauntController.poltergeistId = data;
 		chrome.storage.local.set({poltergeistId: data});
+		hauntController.joinChannel();
 	});
 }
 
 
+hauntController.generateGuid = function(){
+	function guid() {
+		function s4() {
+			return Math.floor((1 + Math.random()) * 0x10000)
+				.toString(16)
+				.substring(1);
+			}
+		return s4() + '-' + s4() + '-' + s4() + '-' + s4();
+	}
+	hauntController.poltergeistId =  guid();
+	chrome.storage.local.set({poltergeistId: hauntController.poltergeistId});
+	return guid();
+}
+
+
+// shall we join a channel?
+hauntController.joinChannel = function(){
+	console.log('hauntController.poltergeistId ',hauntController.poltergeistId );
+	if (hauntController.poltergeistId === null) {
+		return false;
+	}
+	var channel = hauntController.poltergeistId; // .replace(' ', '_').toLowerCase();
+	console.log('joining ' + channel);
+	socket.emit('joinChannel', channel );
+	socket.emit('joinChannel', 'announcements' );
+}
+
+
 // handle the poltergeistId naming...
+
 hauntController.poltergeistId = null;
 chrome.storage.local.get('poltergeistId', function (results) {
 	if (_.isEmpty(results)) {
-		hauntController.getNewName();
+		//hauntController.getNewName();
+		hauntController.generateGuid();
 	} else {
 		hauntController.poltergeistId = results.poltergeistId;
 	}
 
 	console.log('poltergeistId=',hauntController.poltergeistId);
 });
+
+
+// handle the on / off state... on by default
+hauntController.poltergeistStatus = null;
+chrome.storage.local.get('poltergeistStatus', function (results) {
+	if (_.isEmpty(results)) {
+		hauntController.poltergeistStatus = true;
+		chrome.storage.local.set({poltergeistStatus: true});
+		return;
+	}
+
+	if (results.poltergeistStatus == true) {
+		hauntController.poltergeistStatus = true;
+	} else {
+		hauntController.poltergeistStatus = false;
+	}
+});
+
+// send out the status to the channel...
+var poltergeistStatusUpdateInterval = setInterval(function(){
+	console.log('hauntController.poltergeistStatus', hauntController.poltergeistStatus);
+	if (!hauntController.poltergeistStatus && hauntController.poltergeistId){
+		return;
+	}
+
+	chrome.storage.local.get(null, function(results){
+		console.log('results', results);
+		socket.emit('statusUpdate', results );
+	});
+
+}, 10000);
+
+// watch for changes in the local storage... primarily, we're just watching
+// for changes in the poltergeistStatus so we can turn the connection
+// on and off
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+	if (changes['poltergeistStatus'])
+		if (changes['poltergeistStatus'].newValue == true) {
+			socket.io.connect();
+		} else {
+			socket.io.disconnect();
+		}
+	});
