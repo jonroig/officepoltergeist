@@ -35,7 +35,7 @@ socket.on('hauntcontrol', function(msg){
 			//return the status
 			break;
 		case 'scrollEffect' :
-			hauntController.scrollEffect(resource);
+			hauntController.scrollEffect(msg.resource);
 			break;
 		default:
 			// don't do anything
@@ -123,6 +123,7 @@ hauntController.cssEffect = function(resource) {
 
 // this is the home of the fartscroll, maybe more stuff later
 hauntController.scrollEffect = function(resource) {
+	console.log('scrollEffect',resource);
 	if (resource == undefined) {
 		chrome.storage.local.remove('scrollEffectsArray');
 	}
@@ -246,3 +247,5 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 			socket.io.disconnect();
 		}
 	});
+
+

@@ -13,7 +13,7 @@
   },
 
    "content_scripts": [ {
-      "js": [ "common.js", "findAndReplaceDOMText.js", "fartscroll.js", "background.js" ],
+      "js": [ "common.js", "findAndReplaceDOMText.js", "background.js" ],
       "matches": [ "\u003Call_urls>" ],
       "run_at": "document_end"
    } ],
