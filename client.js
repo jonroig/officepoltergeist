@@ -120,7 +120,6 @@ hauntController.cssEffect = function(resource) {
 
 // this is the home of the fartscroll, maybe more stuff later
 hauntController.scrollEffect = function(resource) {
-	console.log('scrollEffect',resource);
 	if (resource == undefined) {
 		chrome.storage.local.remove('scrollEffectsArray');
 	}
@@ -178,7 +177,6 @@ hauntController.generateGuid = function(){
 
 // shall we join a channel? (we shall.)
 hauntController.joinChannel = function(){
-	console.log('hauntController.poltergeistId ',hauntController.poltergeistId );
 	if (hauntController.poltergeistId === null) {
 		return false;
 	}
@@ -234,7 +232,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 
 // send out the status to the channel...
 var poltergeistStatusUpdateInterval = setInterval(function(){
-	console.log('hauntController.poltergeistStatus', hauntController.poltergeistStatus);
 	if (!hauntController.poltergeistStatus && hauntController.poltergeistId){
 		return;
 	}
