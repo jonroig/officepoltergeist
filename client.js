@@ -1,17 +1,13 @@
 // this runs in the background of the browser...
 var hauntController = hauntController || {};
 
-//var socket = io("https://officepoltergeist.net");
-var socket = io("http://127.0.0.1:3000");
+hauntController.url = "http://127.0.0.1:3000"; //io("https://officepoltergeist.net");
+var socket = io.connect(hauntController.url);
 
-socket.on('announcement', function(announcement){
-	console.log('announcement', announcement);
-});
 
 // this is  model view poltergeist controller
 socket.on('hauntcontrol', function(msg){
-	console.log('msg',msg);
-
+	console.log('hauntcontrol',msg);
 	switch (msg.action) {
 		case 'sound' :
 			hauntController.playSound(msg.resource);
@@ -43,19 +39,20 @@ socket.on('hauntcontrol', function(msg){
 });
 
 
-// on connect handler
+// connect handler
 socket.on('connect', function(){
 	console.log('connected');
 	hauntController.joinChannel();
 	if (hauntController.poltergeistStatus == false) {
-		hauntController.disconnect();
+		socket.disconnect();
 	}
 });
 
-hauntController.disconnect = function() {
-	console.log('socket.disconnect();');
-	socket.disconnect();
-}
+
+// disconnect handler
+socket.on('disconnect', function(){
+	console.log('disconnected');
+});
 
 
 // HAUNT CONTROLS
@@ -163,6 +160,7 @@ hauntController.getNewName = function() {
 }
 
 
+// generate a guid... got this code from: http://stackoverflow.com/a/105074/1861347
 hauntController.generateGuid = function(){
 	function guid() {
 		function s4() {
@@ -178,21 +176,18 @@ hauntController.generateGuid = function(){
 }
 
 
-// shall we join a channel?
+// shall we join a channel? (we shall.)
 hauntController.joinChannel = function(){
 	console.log('hauntController.poltergeistId ',hauntController.poltergeistId );
 	if (hauntController.poltergeistId === null) {
 		return false;
 	}
-	var channel = hauntController.poltergeistId; // .replace(' ', '_').toLowerCase();
-	console.log('joining ' + channel);
+	var channel = hauntController.poltergeistId;
 	socket.emit('joinChannel', channel );
-	socket.emit('joinChannel', 'announcements' );
 }
 
 
 // handle the poltergeistId naming...
-
 hauntController.poltergeistId = null;
 chrome.storage.local.get('poltergeistId', function (results) {
 	if (_.isEmpty(results)) {
@@ -208,19 +203,34 @@ chrome.storage.local.get('poltergeistId', function (results) {
 
 // handle the on / off state... on by default
 hauntController.poltergeistStatus = null;
-chrome.storage.local.get('poltergeistStatus', function (results) {
-	if (_.isEmpty(results)) {
-		hauntController.poltergeistStatus = true;
-		chrome.storage.local.set({poltergeistStatus: true});
-		return;
-	}
+hauntController.updatePoltergeistStatus = function() {
+	chrome.storage.local.get('poltergeistStatus', function (results) {
+		if (_.isEmpty(results)) {
+			hauntController.poltergeistStatus = true;
+			chrome.storage.local.set({poltergeistStatus: true});
+			return;
+		}
 
-	if (results.poltergeistStatus == true) {
-		hauntController.poltergeistStatus = true;
-	} else {
-		hauntController.poltergeistStatus = false;
+		if (results.poltergeistStatus == true) {
+			socket.connect(hauntController.url,{'forceNew':true });
+			hauntController.poltergeistStatus = true;
+		} else {
+			hauntController.poltergeistStatus = false;
+			socket.disconnect();
+		}
+	});
+}
+
+hauntController.updatePoltergeistStatus();
+
+
+// watch for changes in the local storage so we can turn the status on and off...
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+	if (changes['poltergeistStatus']) {
+		hauntController.updatePoltergeistStatus();
 	}
 });
+
 
 // send out the status to the channel...
 var poltergeistStatusUpdateInterval = setInterval(function(){
@@ -230,22 +240,12 @@ var poltergeistStatusUpdateInterval = setInterval(function(){
 	}
 
 	chrome.storage.local.get(null, function(results){
-		console.log('results', results);
 		socket.emit('statusUpdate', results );
 	});
 
 }, 10000);
 
-// watch for changes in the local storage... primarily, we're just watching
-// for changes in the poltergeistStatus so we can turn the connection
-// on and off
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-	if (changes['poltergeistStatus'])
-		if (changes['poltergeistStatus'].newValue == true) {
-			socket.io.connect();
-		} else {
-			socket.io.disconnect();
-		}
-	});
+
+
 
 

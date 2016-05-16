@@ -1,18 +1,19 @@
 // this is the thing that runs everytime a page loads...
 var officePoltergeist = officePoltergeist || {};
 
-officePoltergeist.localBrowserEffectsObj = {};
-
-
 // this is where we look at all the search and replace terms...
 officePoltergeist.searchAndReplaceArray = [];
 officePoltergeist.runSearches = function() {
+
 	// undo any previous searches
 	_.each(officePoltergeist.searchAndReplaceArray, function(findObj) {
 		findObj.revert();
 	})
 	officePoltergeist.searchAndReplaceArray = [];
 
+	if (officePoltergeist.poltergeistStatus === false) {
+		return;
+	}
 	// re-do the new searchs
 	chrome.storage.local.get('searchArray', function (results) {
 		_.each(results.searchArray, function(searchObj){
@@ -34,12 +35,13 @@ officePoltergeist.runSearches = function() {
 
 
 officePoltergeist.applyScrollEffects = function() {
+	if (officePoltergeist.poltergeistStatus === false) {
+		return;
+	}
 	chrome.storage.local.get('scrollEffectsArray', function (results) {
-		console.log('scrollEffectsArray',results);
 		_.each(results.scrollEffectsArray, function(scrollEffectObj){
 			switch (scrollEffectObj.effect) {
 				case 'fartscroll' :
-					console.log('fartscroll');
 					officePoltergeist.fartTriggerDistance  = scrollEffectObj.value;
 					break;
 				default:
@@ -52,9 +54,12 @@ officePoltergeist.applyScrollEffects = function() {
 
 // this is where we handle the application of all css-related effects...
 officePoltergeist.applyCssEffects = function() {
+	if (officePoltergeist.poltergeistStatus === false) {
+		return;
+	}
+
 	webkitFilterArray = [];
 	chrome.storage.local.get('cssEffectsArray', function (results) {
-		console.log('results',results);
 		_.each(results.cssEffectsArray, function(cssEffectObj){
 			if (cssEffectObj != null) {
 				switch (cssEffectObj.effect) {
@@ -134,6 +139,10 @@ officePoltergeist.applyCssEffects = function() {
 
 // http://www.youtube.com/v/oHg5SJYRHA0?version=3
 officePoltergeist.applyPageEffects = function() {
+	if (officePoltergeist.poltergeistStatus === false) {
+		return;
+	}
+
 	chrome.storage.local.get('pageEffectsArray', function (results) {
 		_.each(results.pageEffectsArray, function(pageEffectObj){
 			if (pageEffectObj.activated == true) {
@@ -163,9 +172,6 @@ officePoltergeist.applyPageEffects = function() {
 
 // everytime the local storage changes, apply the changes...
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-	console.log('changes',changes);
-	console.log('namespace',namespace);
-
 	if (changes['cssEffectsArray']) {
 		officePoltergeist.applyCssEffects();
 	}
@@ -174,6 +180,10 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 	}
 	if (changes['scrollEffectsArray']) {
 		officePoltergeist.applyScrollEffects();
+	}
+
+	if (changes['poltergeistStatus']) {
+		officePoltergeist.updatePoltergeistStatusFromLocalStorage();
 	}
 });
 
@@ -185,20 +195,38 @@ setInterval(function(){
 
 // this is the stuff we do on page load...
 $(document).ready(function() {
-  	officePoltergeist.applyCssEffects();
-  	officePoltergeist.runSearches();
-  	officePoltergeist.applyScrollEffects();
+  	officePoltergeist.updatePoltergeistStatusFromLocalStorage();
 });
 
+
+officePoltergeist.poltergeistStatus = false;
+officePoltergeist.updatePoltergeistStatusFromLocalStorage = function() {
+	chrome.storage.local.get('poltergeistStatus', function (results) {
+		if (results.poltergeistStatus === true) {
+			officePoltergeist.poltergeistStatus = true;
+			officePoltergeist.doPoltergeistScreenUpdate();
+		} else {
+			officePoltergeist.poltergeistStatus = false;
+		}
+	});
+}
+
+officePoltergeist.doPoltergeistScreenUpdate = function() {
+	officePoltergeist.applyCssEffects();
+  	officePoltergeist.runSearches();
+  	officePoltergeist.applyScrollEffects();
+}
+
 // any keyboard effects are handled in here...
-$(document).on( "keydown", function(keyEvent){
+$(document).on( "keydown", function(keyEvent) {
+	if (officePoltergeist.poltergeistStatus === false) {
+		return;
+	}
 	chrome.storage.local.get('keyEffectsArray', function (results) {
-		console.log('keyEffectsArray',results);
-		_.each(results.keyEffectsArray, function(keyEffectObj){
+		_.each(results.keyEffectsArray, function(keyEffectObj) {
 			if (keyEffectObj.activated == true) {
 				switch (keyEffectObj.effect) {
 					case 'loudTyping' :
-						console.log('loudTyping');
 						var myAudio = new Audio();
 						myAudio.src = chrome.extension.getURL("media/button_push.mp3");
 						myAudio.play();
@@ -217,12 +245,14 @@ $(document).on( "keydown", function(keyEvent){
 
 // fartscroll total control... adapted from theonion's fartscroll
 // https://github.com/theonion/fartscroll.js
-window.addEventListener('scroll', officePoltergeist.fartHandler, false);
+$(window).scroll(function(){
+	officePoltergeist.fartHandler();
+});
 
 officePoltergeist.lastFartOffset = null;
 officePoltergeist.fartTriggerDistance = false;
 officePoltergeist.fartHandler = function() {
-	if (officePoltergeist.fartTriggerDistance === false) {
+	if (officePoltergeist.fartTriggerDistance === false || officePoltergeist.poltergeistStatus === false) {
 		return;
 	}
 
