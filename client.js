@@ -1,11 +1,13 @@
 // this runs in the background of the browser...
+// you can see its output through the chrome extension background pages interface...
+
 var hauntController = hauntController || {};
 
 hauntController.url = "http://127.0.0.1:3000"; //io("https://officepoltergeist.net");
 var socket = io.connect(hauntController.url);
 
 
-// this is  model view poltergeist controller
+// this is a model / view / poltergeist controller
 socket.on('hauntcontrol', function(msg){
 	console.log('hauntcontrol',msg);
 	switch (msg.action) {
@@ -56,12 +58,14 @@ socket.on('changeChannel', function(data){
 });
 
 
+// part of the sync process... when we get this, we know we've synched to a phone...
 socket.on('mobileStatusUpdate', function(data) {
 	console.log('mobileStatusUpdate');
 	chrome.storage.local.get(null, function(results){
 		socket.emit('statusUpdate', results );
 	});
 });
+
 
 // when a client wants an update.
 socket.on('gimmeUpdate', function(){
@@ -70,6 +74,7 @@ socket.on('gimmeUpdate', function(){
 		socket.emit('statusUpdate', results );
 	});
 });
+
 
 // connect handler
 socket.on('connect', function(){
