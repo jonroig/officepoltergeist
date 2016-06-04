@@ -55,7 +55,7 @@ Gosh! I'm totally working on it. None of this is "production" ready yet. I'll ha
 - <a href="http://underscorejs.org/">underscore.js</a>
 - <a href="http://socket.io/">socket.io</a>
 - <a href="https://github.com/theonion/fartscroll.js">fartscroll.js</a>
-- <a href="http://www.colourlovers.com/palette/199752/He_Is_Watching_You">he is watching you</a> color palette
+- <a href="http://www.colourlovers.com/palette/199752/He_Is_Watching_You">he is watching you</a>
 
 
 
