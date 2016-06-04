@@ -39,6 +39,23 @@ socket.on('hauntcontrol', function(msg){
 });
 
 
+// when a client wants an update.
+socket.on('changeChannel', function(data){
+	console.log('changeChannel', data);
+	hauntController.poltergeistId = data;
+	chrome.storage.local.set({poltergeistId: hauntController.poltergeistId});
+	hauntController.joinChannel();
+});
+
+
+// when a client wants an update.
+socket.on('gimmeUpdate', function(){
+	console.log('gimmeUpdate');
+	chrome.storage.local.get(null, function(results){
+		socket.emit('statusUpdate', results );
+	});
+});
+
 // connect handler
 socket.on('connect', function(){
 	console.log('connected');
@@ -148,17 +165,6 @@ hauntController.addToEffectArray = function(effectArray, resource) {
 }
 
 
-// get a new poltergiest name from the poltergeist name server
-hauntController.getNewName = function() {
-	var request = $.ajax('https://officepoltergeist.net/getname');
-	request.done(function(data) {
-		hauntController.poltergeistId = data;
-		chrome.storage.local.set({poltergeistId: data});
-		hauntController.joinChannel();
-	});
-}
-
-
 // generate a guid... got this code from: http://stackoverflow.com/a/105074/1861347
 hauntController.generateGuid = function(){
 	function guid() {
@@ -230,18 +236,19 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 });
 
 
-// send out the status to the channel...
-var poltergeistStatusUpdateInterval = setInterval(function(){
-	if (!hauntController.poltergeistStatus && hauntController.poltergeistId){
-		return;
-	}
 
-	chrome.storage.local.get(null, function(results){
-		socket.emit('statusUpdate', results );
-	});
 
-}, 10000);
+// // send out the status to the channel...
+// var poltergeistStatusUpdateInterval = setInterval(function(){
+// 	if (!hauntController.poltergeistStatus && hauntController.poltergeistId){
+// 		return;
+// 	}
 
+// 	chrome.storage.local.get(null, function(results){
+// 		socket.emit('statusUpdate', results );
+// 	});
+
+// }, 10000);
 
 
 

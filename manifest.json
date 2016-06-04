@@ -2,7 +2,7 @@
   "name": "OfficePoltergeist",
   "version": "1.0.0",
   "description": "The Office Poltergeist",
-  "permissions": [ "background", "storage", "tts"],
+  "permissions": [ "background", "storage", "tts" ],
 
    "background": { "scripts": ["socket.io-1.2.0.js", "common.js", "client.js"] },
 
