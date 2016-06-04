@@ -42,11 +42,26 @@ socket.on('hauntcontrol', function(msg){
 // when a client wants an update.
 socket.on('changeChannel', function(data){
 	console.log('changeChannel', data);
-	hauntController.poltergeistId = data;
-	chrome.storage.local.set({poltergeistId: hauntController.poltergeistId});
-	hauntController.joinChannel();
+
+	hauntController.poltergeistId = data.to;
+	chrome.storage.local.set({poltergeistId: hauntController.poltergeistId}, function(){
+		hauntController.leaveChannel(data.from);
+		hauntController.joinChannel();
+		var gimmeMobileUpdateObj = {
+			poltergeistId: hauntController.poltergeistId
+		}
+		console.log('gimmeMobileUpdate');
+		socket.emit('gimmeMobileUpdate', gimmeMobileUpdateObj);
+	});
 });
 
+
+socket.on('mobileStatusUpdate', function(data) {
+	console.log('mobileStatusUpdate');
+	chrome.storage.local.get(null, function(results){
+		socket.emit('statusUpdate', results );
+	});
+});
 
 // when a client wants an update.
 socket.on('gimmeUpdate', function(){
@@ -188,6 +203,11 @@ hauntController.joinChannel = function(){
 	}
 	var channel = hauntController.poltergeistId;
 	socket.emit('joinChannel', channel );
+}
+
+// shall we join a channel? (we shall.)
+hauntController.leaveChannel = function(channelId){
+	socket.emit('leaveChannel', channelId );
 }
 
 
