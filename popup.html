@@ -10,7 +10,7 @@
 	      width: 400px;
 	      font-family: arial, helvetica, sans-serif;
 	      font-size: 13;
-	      height: 400px;
+	      height: 445px;
 	      background-color: #77181E;
 	      text-align: center;
 	      font-face: arial;
@@ -38,7 +38,7 @@
 		    box-sizing: border-box;
 		}
 		.onoffswitch-inner:before {
-		    content: "ON";
+		    content: "";
 		    padding-left: 10px;
 		    background-color: #33B522; color: #FFFFFF;
 		}
@@ -71,11 +71,12 @@
 			<img src="media/ghostattack.png" id="ghostattack" style="cursor: pointer; width: 350px; padding-top: 20px" />
 			<br/>
 			<h1 style="font-size: 44px; cursor: pointer;" id="poltergeistTitle">OfficePoltergeist</h1>
-			<div style="font-size: 22px; margin-top: -20px;">
-				Poltergeist ID: <span id="poltergeistId"></div>
+			<div style="font-size: 22px; margin-top: -10px;">
+				<a href="#" id="poltergeistSync" style="color: white;
+    margin-bottom: 10px;">sync</a>
 			</div>
-			<div style="font-size: 22px; margin-top: -20px;">
-				<a href="#" id="poltergeistSync">sync</a>
+			<div style="margin-top: 10px">
+				Poltergeist ID: <span id="poltergeistId"></span>
 			</div>
 			<div style="position: relative; padding-top: 20px;left: 150px;">
 				<div class="onoffswitch">
@@ -87,6 +88,7 @@
 				</div>
 				<br/>
 			</div>
+			<div><a href="https://officepoltergeist.net" target="_blank" style="text-decoration: none; font-size: 30px; padding-bottom: 20px; color: black">OfficePoltergeist.net</a></div>
 		</div>
 	</body>
 </html>
