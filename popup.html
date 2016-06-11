@@ -1,84 +1,22 @@
 <html>
 	<head>
 	  <title>OfficePoltergeist</title>
-	  <style>
-	    body {
-	      overflow: hidden;
-	      margin: 0px;
-	    }
-	    #main {
-	      width: 400px;
-	      font-family: arial, helvetica, sans-serif;
-	      font-size: 13;
-	      height: 445px;
-	      background-color: #77181E;
-	      text-align: center;
-	      font-face: arial;
-	      color: white
-	    }
-
-	    .onoffswitch {
-		    position: relative; width: 90px;
-		    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
-		}
-		.onoffswitch-checkbox {
-		    display: none;
-		}
-		.onoffswitch-label {
-		    display: block; overflow: hidden; cursor: pointer;
-		    border: 2px solid #999999; border-radius: 20px;
-		}
-		.onoffswitch-inner {
-		    display: block; width: 200%; margin-left: -100%;
-		    transition: margin 0.3s ease-in 0s;
-		}
-		.onoffswitch-inner:before, .onoffswitch-inner:after {
-		    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
-		    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-		    box-sizing: border-box;
-		}
-		.onoffswitch-inner:before {
-		    content: "";
-		    padding-left: 10px;
-		    background-color: #33B522; color: #FFFFFF;
-		}
-		.onoffswitch-inner:after {
-		    content: "OFF";
-		    padding-right: 10px;
-		    background-color: #EEEEEE; color: #999999;
-		    text-align: right;
-		}
-		.onoffswitch-switch {
-		    display: block; width: 26px; margin: 2px;
-		    background: #FFFFFF;
-		    position: absolute; top: 0; bottom: 0;
-		    right: 56px;
-		    border: 2px solid #999999; border-radius: 20px;
-		    transition: all 0.3s ease-in 0s;
-		}
-		.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-		    margin-left: 0;
-		}
-		.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-		    right: 0px;
-		}
-	  </style>
+	  <link href="popupcss/popup.css" rel="stylesheet">
 	  <script src="popupjs/popup.js"></script>
 	  <script src="popupjs/jquery-2.2.3.min.js"></script>
 	</head>
 	<body>
 		<div id="main">
-			<img src="media/ghostattack.png" id="ghostattack" style="cursor: pointer; width: 350px; padding-top: 20px" />
+			<img src="media/ghostattack.png" id="ghostattack" />
 			<br/>
-			<h1 style="font-size: 44px; cursor: pointer;" id="poltergeistTitle">OfficePoltergeist</h1>
-			<div style="font-size: 22px; margin-top: -10px;">
-				<a href="#" id="poltergeistSync" style="color: white;
-    margin-bottom: 10px;">sync</a>
+			<h1 id="poltergeistTitle">OfficePoltergeist</h1>
+			<div >
+				<a href="#" id="poltergeistSync">sync</a>
 			</div>
-			<div style="margin-top: 10px">
+			<div>
 				Poltergeist ID: <span id="poltergeistId"></span>
 			</div>
-			<div style="position: relative; padding-top: 20px;left: 150px;">
+			<div id="onOffSwitchWrapper">
 				<div class="onoffswitch">
 				    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="poltergeistOnOffSwitch" checked>
 				    <label class="onoffswitch-label" for="myonoffswitch">
@@ -88,7 +26,7 @@
 				</div>
 				<br/>
 			</div>
-			<div><a href="https://officepoltergeist.net" target="_blank" style="text-decoration: none; font-size: 30px; padding-bottom: 20px; color: black">OfficePoltergeist.net</a></div>
+			<div><a id="poltergeistBottom" href="https://officepoltergeist.net" target="_blank">OfficePoltergeist.net</a></div>
 		</div>
 	</body>
 </html>
