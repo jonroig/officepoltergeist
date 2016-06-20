@@ -94,17 +94,23 @@ socket.on('disconnect', function(){
 
 // HAUNT CONTROLS
 
-// play a sound
+// handle the sounds
 hauntController.soundArray = [];
 hauntController.handleSound = function(resource) {
-	console.log('hauntController.soundArray ',hauntController.soundArray )
-	var myAudio = new Audio();
+
+	// play a sound
 	if (resource.action == 'play') {
+		var myAudio = new Audio();
 		myAudio.src = "media/" + resource.sound;
 		myAudio.media = resource.sound;
+		myAudio.onended = function() {
+			socket.emit('soundStatusUpdate', hauntController.soundArray  );
+		}
 		myAudio.play();
 		hauntController.soundArray.push(myAudio);
 	}
+
+	// stop all the sounds of a given type, strike 'em from the record
 	if (resource.action == 'stop') {
 		_.each(hauntController.soundArray, function(soundObj) {
 			if (soundObj.media === resource.sound) {
@@ -116,9 +122,10 @@ hauntController.handleSound = function(resource) {
 			if (soundObj.media === resource.sound) {
 				return true;
 			}
-		})
-	}
+		});
 
+		socket.emit('soundStatusUpdate', hauntController.soundArray);
+	}
 }
 
 
