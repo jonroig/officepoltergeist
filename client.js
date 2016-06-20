@@ -12,7 +12,7 @@ socket.on('hauntcontrol', function(msg){
 	console.log('hauntcontrol',msg);
 	switch (msg.action) {
 		case 'sound' :
-			hauntController.playSound(msg.resource);
+			hauntController.handleSound(msg.resource);
 			break;
 		case 'replace' :
 			hauntController.searchAndReplace(msg.resource);
@@ -96,12 +96,32 @@ socket.on('disconnect', function(){
 
 // play a sound
 hauntController.soundArray = [];
-hauntController.playSound = function(resource) {
+hauntController.handleSound = function(resource) {
+	console.log('hauntController.soundArray ',hauntController.soundArray )
 	var myAudio = new Audio();
-	myAudio.src = "media/" + resource;
-	myAudio.play();
-	soundArray.push(myAudio);
+	if (resource.action == 'play') {
+		myAudio.src = "media/" + resource.sound;
+		myAudio.media = resource.sound;
+		myAudio.play();
+		hauntController.soundArray.push(myAudio);
+	}
+	if (resource.action == 'stop') {
+		_.each(hauntController.soundArray, function(soundObj) {
+			if (soundObj.media === resource.sound) {
+				soundObj.pause();
+			}
+		});
+
+		hauntController.soundArray = _.reject(hauntController.soundArray, function(soundObj) {
+			if (soundObj.media === resource.sound) {
+				return true;
+			}
+		})
+	}
+
 }
+
+
 
 
 // speech...
